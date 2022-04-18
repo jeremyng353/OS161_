@@ -1,0 +1,34 @@
+Step 2
+1. When thread_exit() in thread.c is called, the thread gets detached from the process, its stack is checked to make sure no overflow has
+    occurred, and interrupts are turned off for the processor. When a thread sleeps, it's added to the list in the wait channel, and
+    the spinlock is released. 
+    
+2. thread_switch() in thread.c, which calls switchframe_switch(), which is run by the assembler in switch.S.
+
+3.  S_RUN: A thread that is currently running.
+    S_READY: A thread that is able to run but is not running at the moment. 
+    S_SLEEP: A thread that is currently sleeping.
+    S_ZOMBIE: A thread that has gone through exit but hasn't been deleted yet.
+
+4. Even if the thread gets an interrupt signal, the thread won't handle it (won't call the handler). This is accomplished by calling 
+    splhigh(), which sets the interrupt priority to the highest value. This is important because we don't want anything interrupting
+    the code in the thread subsystem, such as context switches getting interrupted. 
+
+5. The sleeping thread is removed from the wait channel and is woken up via wchan_wakeall() or wchan_wakeone() in thread.c. The functions
+    either wake up all or one of the threads that are sleeping on a wait channel, and both call thread_make_runnable() to make either all
+    or one of the threads runnable again. 
+    
+6. schedule() in thread.c determines which thread should run next.
+
+7. Since the function is currently empty, the threads will run in a round-robin fashion. 
+
+8. The hardware clock, hardclock() in clock.c, decides how often schedule() is called. The frequency of schedule() depends on the
+    hardclock and the constant SCHEDULE_HARDCLOCKS. 
+    
+9. wchan_sleep() and wchan_wakeone() are used to either put a thread on a wait channel to sleep or to wake a sleeping thread up. In the 
+    case of semaphores, wchan_sleep() can be used to put a thread to sleep when the semaphore's value is 0, or wchan_wakeone() can be
+    used to wake up a thread that has been waiting for the semaphore's value to become 1 or greater (binary/counter implementation).
+    
+10. In thread_switch(), a spinlock is acquired (line 586) to ensure that the thread successfully switches states before anything else happens. 
+    The spinlock is only released after the thread has transitioned into the new state. In the case of a thread going to sleep, the spinlock
+    is only released after the thread is on the list. 

@@ -1,0 +1,9 @@
+diff a/kern/conf/conf.kern b/kern/conf/conf.kern	(rejected hunks)
+@@ -377,6 +377,7 @@
+ file      syscall/loadelf.c
+ file      syscall/openfile.c
+ file      syscall/runprogram.c
++file      syscall/file_syscalls.c
+ file      syscall/time_syscalls.c
+ 
+ #
